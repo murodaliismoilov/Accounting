@@ -1,0 +1,48 @@
+﻿@page "/Statistic"
+@inject HttpClient httpClient
+
+<DxChart Data="@ChartsData"
+         Width="100%">
+    <DxChartLineSeries Name="Июнь"
+                       T="AccountingModel"
+                       TArgument="string"
+                       TValue="double"
+                       ValueField="si => si.Sum"
+                       ArgumentField="si => si.AddedDate.ToString()"
+                       SummaryMethod="Enumerable.Sum"
+                       Filter="si => si.AddedDate.Month == 6"/>
+    <DxChartLineSeries Name="Июль"
+                       T="AccountingModel"
+                       TArgument="string"
+                       TValue="double"
+                       ArgumentField="si => si.AddedDate.ToString()"
+                       ValueField="si => si.Sum"
+                       SummaryMethod="Enumerable.Sum"
+                       Filter="si => si.AddedDate.Month == 7" />
+    <DxChartLineSeries Name="Август"
+                       T="AccountingModel"
+                       TArgument="string"
+                       TValue="double"
+                       ArgumentField="si => si.AddedDate.ToString()"
+                       ValueField="si => si.Sum"
+                       SummaryMethod="Enumerable.Sum"
+                       Filter="si => si.AddedDate.Month == 8"/>
+    <DxChartLegend Position="RelativePosition.Outside"
+                   HorizontalAlignment="HorizontalAlignment.Right" />
+
+    <DxChartTooltip Enabled="true"
+                    Position="RelativePosition.Outside">
+        <div style="margin: 0.75rem">
+            <div class="font-weight-bold">@context.Point.Argument,</div>
+            <div>Sales: @($"${context.Point.Value:#,0.00}")</div>
+        </div>
+    </DxChartTooltip>
+</DxChart>
+
+@code {
+    private IEnumerable<AccountingModel>? ChartsData;
+
+    protected override async Task OnInitializedAsync() {
+        ChartsData =  await httpClient.GetFromJsonAsync<List<AccountingModel>>("api/Base/Accounting/GetAll");
+    }
+}

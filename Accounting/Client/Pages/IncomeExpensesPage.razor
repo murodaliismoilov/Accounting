@@ -1,0 +1,80 @@
+﻿@page "/IncomeExpenses"
+@inject HttpClient httpClient
+<DxButton Click="@(() => IncomeExpensesGrid.StartEditNewRowAsync())" style="float:right;" Text="Добавить"/>
+<DxGrid Data="IncomeExpenses"
+        @ref="IncomeExpensesGrid"
+        EditMode="GridEditMode.PopupEditForm"
+        PagerNavigationMode="PagerNavigationMode.InputBox"
+        EditModelSaving="ExpensesIncomeSaving"
+        CustomizeCellDisplayText="Grid_Customize"
+        AllowSelectRowByClick="false"
+        EditFormButtonsVisible="false">
+    <Columns>
+        <DxGridCommandColumn Width="90px" DeleteButtonVisible="false" NewButtonVisible="false" ClearFilterButtonVisible="false">
+            <CellDisplayTemplate>
+                <DxButton type="button" CssClass="btn"  @onclick="@(() => IncomeExpensesGrid.StartEditDataItemAsync(context.DataItem))" Text="Изменить"/>
+            </CellDisplayTemplate>
+        </DxGridCommandColumn>
+        <DxGridDataColumn FieldName="Name" Caption="Категория Доход/Расход"/>
+        <DxGridDataColumn FieldName="CategoryIncomeExpensesId" Caption="Приход/Расход"/>
+    </Columns>
+    <EditFormTemplate Context="EditGrid">
+        @{
+            var item = (IncomeExpense)EditGrid.EditModel;
+        }
+            <DxFormLayout CaptionPosition="CaptionPosition.Vertical">
+                <DxFormLayoutItem Caption="Приход/расход" Context="formLayoutContext">
+                    <DxComboBox Data="categoryIncomeExpenses"
+                            TextFieldName="@nameof(CategoryIncomeExpenses.Name)"
+                            ValueFieldName="@nameof(CategoryIncomeExpenses.Id)"
+                            @bind-Value="item.CategoryIncomeExpensesId"/>
+                    <ValidationMessage For="@(() => item.CategoryIncomeExpensesId)"/>
+                </DxFormLayoutItem>
+
+               
+                <DxFormLayoutItem Caption="Категория Доход/Расход" Context="formLayoutContext">
+                    <DxTextBox @bind-Text="item.Name"/>
+                    <ValidationMessage For="@(() => item.Name)"/>
+                </DxFormLayoutItem>
+
+                <DxFormLayoutItem Context="FormLayoutContext" ColSpanMd="12">
+                <div class="float-right"> 
+                    <DxButton SubmitFormOnClick="true" RenderStyle="ButtonRenderStyle.Primary" Text="Обновить"/>
+                    <DxButton RenderStyle="ButtonRenderStyle.Link" Text="Отмена" Click="@(() => IncomeExpensesGrid.CancelEditAsync())"/>
+                </div>
+            </DxFormLayoutItem>
+            </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+
+@code {
+    private List<IncomeExpense> IncomeExpenses = new List<IncomeExpense>();
+    private List<CategoryIncomeExpenses> categoryIncomeExpenses = new List<CategoryIncomeExpenses>();
+    private IGrid IncomeExpensesGrid;
+    protected override async Task OnInitializedAsync()
+    {
+        IncomeExpenses = await httpClient.GetFromJsonAsync<List<IncomeExpense>>("api/Base/IncomeExpenses/GetAll");
+        categoryIncomeExpenses = await httpClient.GetFromJsonAsync<List<CategoryIncomeExpenses>>("api/Base/CategoryIncomeExpenses/GetAll");
+    }
+
+    async Task ExpensesIncomeSaving(GridEditModelSavingEventArgs e)
+    {
+        var response = await httpClient.PostAsJsonAsync("api/Base/IncomeExpenses/UpdateOrAdd",(IncomeExpense)e.EditModel);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<IncomeExpense>();
+            await IncomeExpensesGrid.CancelEditAsync(); 
+            if (e.IsNew)
+                IncomeExpenses.Add(result);
+            StateHasChanged();
+            IncomeExpenses = await httpClient.GetFromJsonAsync<List<IncomeExpense>>("api/Base/IncomeExpenses/GetAll");
+            IncomeExpensesGrid.RefreshSummary();
+        }
+    }
+
+    void Grid_Customize(GridCustomizeCellDisplayTextEventArgs e)
+    {
+        if (e.FieldName == "CategoryIncomeExpensesId")
+            e.DisplayText = categoryIncomeExpenses.Where(c => c.Id == (int)e.Value).FirstOrDefault()?.Name;
+    }
+}
