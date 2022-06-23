@@ -16,6 +16,18 @@ public class BaseController : Controller
     [Route(("Accounting/GetAll"))]
     public async Task<IActionResult> AccountingGetAllAsync() => Ok(await _iUnitOfWork.AccountingModelService.GetAllAsync());
 
+    [HttpGet]
+    [Route("Accounting/GetAllIncomesAsync")]
+    public async Task<IActionResult> GetAllIncomesAsync() => Ok(await _iUnitOfWork.AccountingModelService.GetIncomesAsync());
+
+    [HttpGet]
+    [Route("Accounting/GetAllExpensesAsync")]
+    public async Task<IActionResult> GetAllExpensesAsync() => Ok(await _iUnitOfWork.AccountingModelService.GetExpensesAsync());
+
+    [HttpGet]
+    [Route("Accounting/GetAllAccountingAsync")]
+    public async Task<IActionResult> GetAllAccountingAsync() => Ok(await _iUnitOfWork.AccountingModelService.GetAllAccountingAsync());
+
     [HttpPost]
     [Route("Accounting/UpdateOrAdd")]
     public async Task<IActionResult> AccountingUpdateOrData([FromBody] AccountingModel accounting)

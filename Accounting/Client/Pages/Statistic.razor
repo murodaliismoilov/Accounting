@@ -1,48 +1,161 @@
 ﻿@page "/Statistic"
 @inject HttpClient httpClient
 
-<DxChart Data="@ChartsData"
-         Width="100%">
-    <DxChartLineSeries Name="Июнь"
-                       T="AccountingModel"
-                       TArgument="string"
-                       TValue="double"
-                       ValueField="si => si.Sum"
-                       ArgumentField="si => si.AddedDate.ToString()"
-                       SummaryMethod="Enumerable.Sum"
-                       Filter="si => si.AddedDate.Month == 6"/>
-    <DxChartLineSeries Name="Июль"
-                       T="AccountingModel"
-                       TArgument="string"
-                       TValue="double"
-                       ArgumentField="si => si.AddedDate.ToString()"
-                       ValueField="si => si.Sum"
-                       SummaryMethod="Enumerable.Sum"
-                       Filter="si => si.AddedDate.Month == 7" />
-    <DxChartLineSeries Name="Август"
-                       T="AccountingModel"
-                       TArgument="string"
-                       TValue="double"
-                       ArgumentField="si => si.AddedDate.ToString()"
-                       ValueField="si => si.Sum"
-                       SummaryMethod="Enumerable.Sum"
-                       Filter="si => si.AddedDate.Month == 8"/>
-    <DxChartLegend Position="RelativePosition.Outside"
-                   HorizontalAlignment="HorizontalAlignment.Right" />
+<div class="container">
+    <div class="col-12">
+        <h4 style="text-align:center;">
+            Статистика приходов.
+        </h4>
 
-    <DxChartTooltip Enabled="true"
-                    Position="RelativePosition.Outside">
-        <div style="margin: 0.75rem">
-            <div class="font-weight-bold">@context.Point.Argument,</div>
-            <div>Sales: @($"${context.Point.Value:#,0.00}")</div>
-        </div>
-    </DxChartTooltip>
-</DxChart>
+        <h4 style="text-align:center;">
+            Общий приход:@SumIncome
+        </h4>
+        <hr />
+        <DxChart Data="@ChartsDataIncome"
+                 Width="100%">
+            <DxChartLineSeries Name="Июнь"
+                               T="AccountingModel"
+                               TArgument="string"
+                               TValue="double"
+                               ValueField="si => si.Sum"
+                               ArgumentField="si => si.AddedDate.ToString()"
+                               SummaryMethod="Enumerable.Sum"
+                               Filter="si => si.AddedDate.Month == 6" />
+            <DxChartLineSeries Name="Июль"
+                               T="AccountingModel"
+                               TArgument="string"
+                               TValue="double"
+                               ArgumentField="si => si.AddedDate.ToString()"
+                               ValueField="si => si.Sum"
+                               SummaryMethod="Enumerable.Sum"
+                               Filter="si => si.AddedDate.Month == 7" />
+            <DxChartLineSeries Name="Август"
+                               T="AccountingModel"
+                               TArgument="string"
+                               TValue="double"
+                               ArgumentField="si => si.AddedDate.ToString()"
+                               ValueField="si => si.Sum"
+                               SummaryMethod="Enumerable.Sum"
+                               Filter="si => si.AddedDate.Month == 8" />
+            <DxChartLegend Position="RelativePosition.Outside"
+                           HorizontalAlignment="HorizontalAlignment.Right" />
 
+            <DxChartTooltip Enabled="true"
+                            Position="RelativePosition.Outside">
+                <div style="margin: 0.75rem">
+                    <div class="font-weight-bold">@context.Point.Argument,</div>
+                    <div>Приход: @($"${context.Point.Value:#,0.00}")</div>
+                </div>
+            </DxChartTooltip>
+        </DxChart>
+    </div>
+</div>
+
+<div class="container">
+    <div class="col-12">
+        <h4 style="text-align:center;">
+            Статистика расходов.
+        </h4>
+
+        <h4 style="text-align:center;">
+            Общий расход:@SumExpenses
+        </h4>
+        <hr />
+        <DxChart Data="@ChartsDataExpenses"
+                 Width="100%">
+            <DxChartLineSeries Name="Июнь"
+                               T="AccountingModel"
+                               TArgument="string"
+                               TValue="double"
+                               ValueField="si => si.Sum"
+                               ArgumentField="si => si.AddedDate.ToString()"
+                               SummaryMethod="Enumerable.Sum"
+                               Filter="si => si.AddedDate.Month == 6" />
+            <DxChartLineSeries Name="Июль"
+                               T="AccountingModel"
+                               TArgument="string"
+                               TValue="double"
+                               ArgumentField="si => si.AddedDate.ToString()"
+                               ValueField="si => si.Sum"
+                               SummaryMethod="Enumerable.Sum"
+                               Filter="si => si.AddedDate.Month == 7" />
+            <DxChartLineSeries Name="Август"
+                               T="AccountingModel"
+                               TArgument="string"
+                               TValue="double"
+                               ArgumentField="si => si.AddedDate.ToString()"
+                               ValueField="si => si.Sum"
+                               SummaryMethod="Enumerable.Sum"
+                               Filter="si => si.AddedDate.Month == 8" />
+            <DxChartLegend Position="RelativePosition.Outside"
+                           HorizontalAlignment="HorizontalAlignment.Right" />
+
+            <DxChartTooltip Enabled="true"
+                            Position="RelativePosition.Outside">
+                <div style="margin: 0.75rem">
+                    <div class="font-weight-bold">@context.Point.Argument,</div>
+                    <div>Расход: @($"${context.Point.Value:#,0.00}")</div>
+                </div>
+            </DxChartTooltip>
+        </DxChart>
+    </div>
+</div>
+<div class="container">
+    <div class="col-12">
+        <h4 style="text-align:center;">
+          Общая статистика.  
+        </h4>
+        <hr />
+        <DxPieChart Data="@ChartsDataGetAll"
+                    Diameter="diameter"
+                    InnerDiameter="innerDiameter"
+                    T="AccountingModel">
+            <DxPieChartSeries T="AccountingModel"
+                              TArgument="string"
+                              TValue="double"
+                              ValueField="si => si.Sum"
+                              ArgumentField="si => si.CategoryIncomeExpenses.Name"
+                              SummaryMethod="Enumerable.Sum">
+                <DxChartSeriesLabel Visible="true"
+                                    Position="labelPosition"
+                                    Format="ChartElementFormat.Thousands(1)">
+                    <DxChartSeriesLabelConnector Visible="true" />
+                </DxChartSeriesLabel>
+            </DxPieChartSeries>
+            <DxChartTooltip Enabled="true"
+                            Position="RelativePosition.Outside">
+                <div style="margin: 0.75rem">
+                    <div class="fw-bold">@context.Point.Argument: @($"${context.Point.Value:#,0.}")</div>
+                </div>
+            </DxChartTooltip>
+
+            <DxChartTitle Text="@HeaderText">
+                <DxChartSubTitle Text="USD" />
+            </DxChartTitle>
+            <DxChartLegend HorizontalAlignment="HorizontalAlignment.Center"
+                           VerticalAlignment="VerticalEdge.Bottom"
+                           Position="RelativePosition.Outside"
+                           Orientation="Orientation.Horizontal" />
+        </DxPieChart>
+    </div>
+</div>
 @code {
-    private IEnumerable<AccountingModel>? ChartsData;
-
-    protected override async Task OnInitializedAsync() {
-        ChartsData =  await httpClient.GetFromJsonAsync<List<AccountingModel>>("api/Base/Accounting/GetAll");
+    double ? SumIncome { get; set; }
+    double ? SumExpenses { get; set; }
+    private IEnumerable<AccountingModel> ChartsDataIncome;
+    private IEnumerable<AccountingModel> ChartsDataExpenses;
+    private IEnumerable<AccountingModel> ChartsDataGetAll;
+    double? diameter = null;
+    double innerDiameter = 0.5;
+    string? HeaderText { get; set; }
+    RelativePosition labelPosition = RelativePosition.Outside;
+    protected override async Task OnInitializedAsync()
+    {
+        ChartsDataGetAll = await httpClient.GetFromJsonAsync<List<AccountingModel>>("api/Base/Accounting/GetAllAccountingAsync");
+        ChartsDataIncome = await httpClient.GetFromJsonAsync<List<AccountingModel>>("api/Base/Accounting/GetAllIncomesAsync");
+        ChartsDataExpenses = await httpClient.GetFromJsonAsync<List<AccountingModel>>("api/Base/Accounting/GetAllExpensesAsync");
+        HeaderText = ChartsDataGetAll?.Sum(x => x.Sum).ToString();
+        SumExpenses = ChartsDataExpenses?.Sum(x => x.Sum);
+        SumIncome = ChartsDataIncome?.Sum(x => x.Sum);
     }
 }

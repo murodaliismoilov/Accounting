@@ -8,26 +8,21 @@
         PagerNavigationMode="PagerNavigationMode.InputBox"
         EditModelSaving="IssuerAddressEditMode"
         AllowSelectRowByClick="false"
+        ShowFilterRow="true"
         CustomizeCellDisplayText="Grid_Customize"
-        EditFormButtonsVisible="false"
-        UnboundColumnData="Grid_UnboundColumnData">
+        EditFormButtonsVisible="false">
     <Columns>
         <DxGridCommandColumn Width="90px" DeleteButtonVisible="false" NewButtonVisible="false" ClearFilterButtonVisible="false">
             <CellDisplayTemplate>
                 <DxButton type="button" CssClass="btn" @onclick="@(() => AccountingGrid.StartEditDataItemAsync(context.DataItem))" Text="Изменить"/>
             </CellDisplayTemplate>
         </DxGridCommandColumn>
-        <DxGridDataColumn FieldName="IncomeExpensesId" Caption="Категория доходов и расходов"/>
-        <DxGridDataColumn FieldName="CategoryIncomeExpensesId" Caption="Доход/Расход"/>
-        <DxGridDataColumn FieldName="Sum" Caption="Сумма"/>
+        <DxGridDataColumn FieldName="IncomeExpensesId" Caption="Категория доходов и расходов" />
+        <DxGridDataColumn FieldName="CategoryIncomeExpensesId" Caption="Доход/Расход" />
+        <DxGridDataColumn FieldName="Sum" Caption="Сумма" />
         <DxGridDataColumn FieldName="AddedDate" Caption="Дата добавления" DisplayFormat="dddd, dd MMMM yyyy HH:mm:ss"/>
         <DxGridDataColumn FieldName="Note" Caption="Примечания"/>
     </Columns>
-    <TotalSummary>
-        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Sum"  Name="Общая сумма" />
-        <DxGridSummaryItem SummaryType="GridSummaryItemType.Max" FieldName="Sum"  Name="Маскимальная сумма" />
-        <DxGridSummaryItem SummaryType="GridSummaryItemType.Min" FieldName="Sum"  Name="Минимальная сумма" />
-    </TotalSummary>
     <EditFormTemplate Context="EditFormContexts">
         @{
             accountingModel = (AccountingModel)EditFormContexts.EditModel;
@@ -37,8 +32,7 @@
                 <DxComboBox Data="expensesIncome"
                             TextFieldName="@nameof(IncomeExpense.Name)"
                             ValueFieldName="@nameof(IncomeExpense.Id)"
-                            @bind-Value="accountingModel.IncomeExpensesId" 
-                            SelectedItemChanged="@((IncomeExpense incomeExpense) => OnchangeIncomeExpense(incomeExpense))"/>
+                            @bind-Value="accountingModel.IncomeExpensesId"/>
                            <ValidationMessage For="@(() => accountingModel.IncomeExpensesId)"/>
             </DxFormLayoutItem>
 
@@ -46,8 +40,7 @@
                 <DxComboBox Data="categoryIncomeExpenses"
                             TextFieldName="@nameof(CategoryIncomeExpenses.Name)"
                             ValueFieldName="@nameof(CategoryIncomeExpenses.Id)"
-                            @bind-Value="accountingModel.CategoryIncomeExpensesId" 
-                            ReadOnly="true"/>
+                            @bind-Value="accountingModel.CategoryIncomeExpensesId"/>
                            <ValidationMessage For="@(() => accountingModel.CategoryIncomeExpensesId)"/>
             </DxFormLayoutItem>
 
@@ -114,17 +107,5 @@
             e.DisplayText = categoryIncomeExpenses.Where(c => c.Id == (int)e.Value).FirstOrDefault()?.Name;
     }
 
-    void OnchangeIncomeExpense(IncomeExpense income)
-    {
-        accountingModel.CategoryIncomeExpensesId = income.CategoryIncomeExpensesId;
-    }
 
-    void Grid_UnboundColumnData(GridUnboundColumnDataEventArgs e) {
-        if(e.FieldName == "Sum") {
-            double sum = (double)e.GetRowValue("Sum");
-            DateTime today = DateTime.Now.Date;
-            DateTime oneMothAgo = today.AddMonths(-1);
-            bool isOk = (DateTime)e.GetRowValue("AddedDate") <= oneMothAgo;
-        }
-    }
 }

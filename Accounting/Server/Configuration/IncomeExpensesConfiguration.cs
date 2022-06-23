@@ -10,6 +10,5 @@ public class IncomeExpensesConfiguration : BaseEntityConfiguration<IncomeExpense
     {
         base.Configure(builder);
         builder.Property(x => x.Name).IsRequired().HasMaxLength(50);
-        builder.HasOne(x => x.CategoryIncomeExpenses).WithMany(p => p.IncomeExpenses).HasForeignKey(x => x.CategoryIncomeExpensesId).OnDelete(DeleteBehavior.Restrict);
     }
 }

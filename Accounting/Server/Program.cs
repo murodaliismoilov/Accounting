@@ -1,5 +1,6 @@
 using Accounting.Server;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,8 @@ IConfiguration configuration = new ConfigurationBuilder().AddJsonFile("appsettin
 string connection = builder.Configuration.GetConnectionString("AccountingDB");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connection));
 builder.Services.AddScoped<IUnitOfWork, AccountingUnitOfWork>();
+builder.Services.AddControllers().AddJsonOptions(x =>
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

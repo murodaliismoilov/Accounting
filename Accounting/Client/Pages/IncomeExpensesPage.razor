@@ -6,7 +6,6 @@
         EditMode="GridEditMode.PopupEditForm"
         PagerNavigationMode="PagerNavigationMode.InputBox"
         EditModelSaving="ExpensesIncomeSaving"
-        CustomizeCellDisplayText="Grid_Customize"
         AllowSelectRowByClick="false"
         EditFormButtonsVisible="false">
     <Columns>
@@ -16,22 +15,12 @@
             </CellDisplayTemplate>
         </DxGridCommandColumn>
         <DxGridDataColumn FieldName="Name" Caption="Категория Доход/Расход"/>
-        <DxGridDataColumn FieldName="CategoryIncomeExpensesId" Caption="Приход/Расход"/>
     </Columns>
     <EditFormTemplate Context="EditGrid">
         @{
             var item = (IncomeExpense)EditGrid.EditModel;
         }
             <DxFormLayout CaptionPosition="CaptionPosition.Vertical">
-                <DxFormLayoutItem Caption="Приход/расход" Context="formLayoutContext">
-                    <DxComboBox Data="categoryIncomeExpenses"
-                            TextFieldName="@nameof(CategoryIncomeExpenses.Name)"
-                            ValueFieldName="@nameof(CategoryIncomeExpenses.Id)"
-                            @bind-Value="item.CategoryIncomeExpensesId"/>
-                    <ValidationMessage For="@(() => item.CategoryIncomeExpensesId)"/>
-                </DxFormLayoutItem>
-
-               
                 <DxFormLayoutItem Caption="Категория Доход/Расход" Context="formLayoutContext">
                     <DxTextBox @bind-Text="item.Name"/>
                     <ValidationMessage For="@(() => item.Name)"/>
@@ -49,12 +38,11 @@
 
 @code {
     private List<IncomeExpense> IncomeExpenses = new List<IncomeExpense>();
-    private List<CategoryIncomeExpenses> categoryIncomeExpenses = new List<CategoryIncomeExpenses>();
     private IGrid IncomeExpensesGrid;
+
     protected override async Task OnInitializedAsync()
     {
         IncomeExpenses = await httpClient.GetFromJsonAsync<List<IncomeExpense>>("api/Base/IncomeExpenses/GetAll");
-        categoryIncomeExpenses = await httpClient.GetFromJsonAsync<List<CategoryIncomeExpenses>>("api/Base/CategoryIncomeExpenses/GetAll");
     }
 
     async Task ExpensesIncomeSaving(GridEditModelSavingEventArgs e)
@@ -70,11 +58,5 @@
             IncomeExpenses = await httpClient.GetFromJsonAsync<List<IncomeExpense>>("api/Base/IncomeExpenses/GetAll");
             IncomeExpensesGrid.RefreshSummary();
         }
-    }
-
-    void Grid_Customize(GridCustomizeCellDisplayTextEventArgs e)
-    {
-        if (e.FieldName == "CategoryIncomeExpensesId")
-            e.DisplayText = categoryIncomeExpenses.Where(c => c.Id == (int)e.Value).FirstOrDefault()?.Name;
     }
 }
