@@ -3,12 +3,19 @@
 
 <div class="container">
     <div class="col-12">
+        <h3 style="text-align:center;">
+           Общий оборот денег за июнь:(@TotalTurnoverOfMoneyForThisMonth), Итого за июнь(@incomeOrExpenses:@totalInThisMonth)
+        </h3>
+        <hr />
+
+     </div>
+    <div class="col-12">
         <h4 style="text-align:center;">
             Статистика приходов.
         </h4>
 
         <h4 style="text-align:center;">
-            Общий приход:@SumIncome
+            Общий приход за июнь:(@SumIncome)
         </h4>
         <hr />
         <DxChart Data="@ChartsDataIncome"
@@ -58,7 +65,7 @@
         </h4>
 
         <h4 style="text-align:center;">
-            Общий расход:@SumExpenses
+              Общий расход за июнь:(@SumExpenses)
         </h4>
         <hr />
         <DxChart Data="@ChartsDataExpenses"
@@ -148,6 +155,9 @@
     double? diameter = null;
     double innerDiameter = 0.5;
     string? HeaderText { get; set; }
+    double? totalInThisMonth { get; set; }
+    string incomeOrExpenses { get; set; }
+    double? TotalTurnoverOfMoneyForThisMonth { get; set; }
     RelativePosition labelPosition = RelativePosition.Outside;
     protected override async Task OnInitializedAsync()
     {
@@ -155,7 +165,16 @@
         ChartsDataIncome = await httpClient.GetFromJsonAsync<List<AccountingModel>>("api/Base/Accounting/GetAllIncomesAsync");
         ChartsDataExpenses = await httpClient.GetFromJsonAsync<List<AccountingModel>>("api/Base/Accounting/GetAllExpensesAsync");
         HeaderText = ChartsDataGetAll?.Sum(x => x.Sum).ToString();
-        SumExpenses = ChartsDataExpenses?.Sum(x => x.Sum);
-        SumIncome = ChartsDataIncome?.Sum(x => x.Sum);
+        SumExpenses = ChartsDataExpenses?.Where(x=>x.AddedDate.Month == 6).Sum(x => x.Sum);
+        SumIncome = ChartsDataIncome?.Where(x=>x.AddedDate.Month == 6).Sum(x => x.Sum);
+        totalInThisMonth = ChartsDataIncome?.Where(x => x.AddedDate.Month == 6).Sum(x => x.Sum) - ChartsDataExpenses?.Where(x => x.AddedDate.Month == 6).Sum(x => x.Sum);
+        TotalTurnoverOfMoneyForThisMonth = ChartsDataIncome?.Where(x => x.AddedDate.Month == 6).Sum(x => x.Sum);
+
+        if (totalInThisMonth == 0)
+            incomeOrExpenses = "";
+        else if (totalInThisMonth > 0)
+            incomeOrExpenses = "прибыль";
+        else
+            incomeOrExpenses = "убыток";
     }
 }
